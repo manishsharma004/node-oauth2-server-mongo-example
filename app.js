@@ -21,7 +21,8 @@ mongoose.connect(mongoUri, function(err, res) {
 
 app.oauth = oauthserver({
 	model: require('./model.js'),
-    grants: ['password']
+    grants: ['password'],
+    accessTokenLifetime: null
 });
     console.log(app.oauth.grant().toString());
 
