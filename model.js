@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var MongoClient = require('mongodb').MongoClient;
+var Server = require('mongodb').Server;
 
 /**
  * Configuration.
@@ -41,6 +43,7 @@ var loadExampleData = function() {
 		console.log('Created user', user);
 	});
 };
+loadExampleData();
 
 /**
  * Dump the database content (for debug).
@@ -89,11 +92,22 @@ var getAccessToken = function(bearerToken, callback) {
  */
 
 var getClient = function(clientId, clientSecret, callback) {
+    console.log(clientId, clientSecret);
+    var mongoclient = new MongoClient(new Server("localhost", 27017), {native_parser: true});
+    MongoClient.connect('mongodb://localhost:27017/oauth', {native_parser:true}, function(err, db) {
 
-	clientModel.findOne({
-		clientId: clientId,
-		clientSecret: clientSecret
-	}, callback);
+            // Get the first db and do an update document on it
+        db.collection('client').findOne({clientId: clientId, clientSecret: clientSecret}, function (err ,client) {
+            console.log(err, client);
+            callback(err, client);
+            db.close();
+        });
+    })
+
+    // clientModel.findOne({
+	// 	clientId: clientId,
+	// 	clientSecret: clientSecret
+	// }, callback);
 };
 
 /**
@@ -126,11 +140,22 @@ var saveAccessToken = function(accessToken, clientId, expires, user, callback) {
  */
 
 var getUser = function(username, password, callback) {
+    console.log(username, password);
+    var mongoclient = new MongoClient(new Server("localhost", 27017), {native_parser: true});
+    MongoClient.connect('mongodb://localhost:27017/oauth', {native_parser:true}, function(err, db) {
 
-	userModel.findOne({
-		username: username,
-		password: password
-	}, callback);
+            // Get the first db and do an update document on it
+        db.collection('user').findOne({username: username, password: password}, function (err, user) {
+            console.log(err, user);
+            callback(err, user);
+            db.close();
+        });
+    })
+
+    // 	userModel.findOne({
+    // 		username: username,
+    // 		password: password
+    // 	}, callback);
 };
 
 /**

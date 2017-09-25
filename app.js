@@ -8,6 +8,8 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+
+
 var mongoUri = 'mongodb://localhost/oauth';
 mongoose.connect(mongoUri, function(err, res) {
 	if (err) {
@@ -16,18 +18,33 @@ mongoose.connect(mongoUri, function(err, res) {
 	console.log('Connected successfully to "%s"', mongoUri);
 });
 
+
 app.oauth = oauthserver({
 	model: require('./model.js'),
-	grants: ['password'],
-	debug: true
+    grants: ['password']
 });
+    console.log(app.oauth.grant().toString());
 
-app.all('/oauth/token', app.oauth.grant());
+var grant = app.oauth.grant();
 
-app.get('/', app.oauth.authorise(), function (req, res) {
-	res.send('Congratulations, you are in a secret area!');
+app.post('/auth/token', function (req, res, next) {
+    return grant(req, res, next);
+
 });
-
-app.use(app.oauth.errorHandler());
+// 
+// console.log(app.oauth);
+// 
+// app.all('/oauth/token', app.oauth.grant());
+// app.post('/oauth/token', app.oauth.grant());
+// 
+// console.log(app.oauth);
+// app.listen(3000);
+// 
+// app.get('/', app.oauth.authorise(), function (req, res) {
+// 	res.send('Congratulations, you are in a secret area!');
+// });
+// console.log(app.oauth);
+// 
+// app.use(app.oauth.errorHandler());
 
 app.listen(3000);
